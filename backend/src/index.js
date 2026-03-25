@@ -11,6 +11,27 @@ app.use('*', cors({
 
 app.get('/api/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
+// Image proxy — menghindari CORS dari images.salambumi.xyz
+app.get('/api/img-proxy/:filename', async (c) => {
+  const filename = c.req.param('filename');
+  const url = `https://images.salambumi.xyz/materai/${encodeURIComponent(decodeURIComponent(filename))}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return c.json({ error: 'Image not found' }, 404);
+    const buffer = await res.arrayBuffer();
+    const contentType = res.headers.get('content-type') || 'image/png';
+    return new Response(buffer, {
+      headers: {
+        'Content-Type': contentType,
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'public, max-age=86400',
+      },
+    });
+  } catch (e) {
+    return c.json({ error: 'Failed to fetch image' }, 500);
+  }
+});
+
 // List all agreements
 app.get('/api/agreements', async (c) => {
   const { env } = c;

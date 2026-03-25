@@ -9,21 +9,21 @@ import { formatCurrency, getCurrentDateIndonesian } from '../utils/format';
 import { Loader2, Eraser, CheckCircle } from 'lucide-react';
 
 // Gunakan proxy path (/img-proxy) agar fetch tidak kena CORS restriction browser.
-// Vite dev server meneruskan /img-proxy/* ke https://images.salambumi.xyz/materai/*
-// di production (Cloudflare Pages / hosting), gambar di-embed via fetch server-side
-// atau CORS sudah allow origin production domain.
+// Dev: Vite proxy /img-proxy/* → https://images.salambumi.xyz/materai/*
+// Production: Worker proxy /api/img-proxy/* → https://images.salambumi.xyz/materai/*
 const isDev = import.meta.env.DEV;
+const WORKER_URL = 'https://sbp-agreements.sbp-digital-agreements.workers.dev';
 
 const IMAGE_URLS = {
   logo: isDev
     ? '/img-proxy/fav.webp'
-    : 'https://images.salambumi.xyz/materai/fav.webp',
+    : `${WORKER_URL}/api/img-proxy/fav.webp`,
   materai: isDev
     ? '/img-proxy/hg.png'
-    : 'https://images.salambumi.xyz/materai/hg.png',
+    : `${WORKER_URL}/api/img-proxy/hg.png`,
   agentSignature: isDev
     ? '/img-proxy/gsd-removebg-preview%20-%20Copy.png'
-    : 'https://images.salambumi.xyz/materai/gsd-removebg-preview%20-%20Copy.png',
+    : `${WORKER_URL}/api/img-proxy/gsd-removebg-preview%20-%20Copy.png`,
 };
 
 async function imageUrlToBase64(url) {
